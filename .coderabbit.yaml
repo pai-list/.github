@@ -1,0 +1,38 @@
+# CodeRabbit org-wide configuration
+# https://docs.coderabbit.ai/configuration
+
+language: en-US
+tone: professional
+early_access: true
+enable_free_tier: true
+
+reviews:
+  profile: thorough
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    ignore_title_patterns:
+      - "^(?:wip|WIP|draft|Draft):"
+      - "^(?:chore|Chore).*"
+      - "^(?:fix|Fix).*conflict"
+    drafts: true
+    base_branches:
+      - "!(main)"
+
+chat:
+  auto_reply: true
+  auto_reply_author: coderabbit
+
+knowledge_base:
+  learnings:
+    scope: organization
+  issues:
+    scope: organization
+  pull_requests:
+    scope: organization
+  patches:
+    scope: organization
