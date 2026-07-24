@@ -1,0 +1,42 @@
+# PAI Universe
+People, Agents, Intelligent — Build Your Economy.
+
+## Organization
+PAI Universe is a single ecosystem. AxiomID is the entry point.
+All services are subdomains of axiomid.app.
+All repos live under github.com/pai-list.
+
+## Core Principles
+1. SOUL Protocol: Muraqabah, Tawbah, TrustChain
+2. One ecosystem, not separate projects
+3. AxiomID is always the front door
+4. Subdomain everything: agent. gspace. discover. memory. mcp. verify. dev.
+
+## Architecture
+Entry → AxiomID (identity, trust, API gateway)
+Layer 1 → Pi Network (human verification, KYC)
+Layer 2 → Ghost.build (pgvector, warm memory)  
+Layer 3 → ADP (agent discovery)
+Layer 4 → PAI-Memory (7-layer memory)
+Layer 5 → pai-mcp (MCP gateway)
+Layer 6 → Gspace (global workspace)
+Layer 7 → Virtuals ACP (commerce)
+
+## Key Files to Read
+- /docs/introduction.md - Start here
+- /agents.txt - Complete ecosystem overview
+- /CONTRIBUTING.md - Contribution guidelines
+- /SOUL.md - Protocol specification
+
+## Common Tasks
+- Create identity: docs/identity-guide.md
+- Deploy agent: docs/deployment-guide.md
+- Build memory: docs/memory-architecture.md
+- Contribute: https://github.com/pai-list/.github/blob/main/CONTRIBUTING.md
+
+## Connectivity
+- HTTP: axiomid.app (Vercel + Cloudflare)
+- MCP: mcp.axiomid.app (Cloudflare Workers)
+- Database: Ghost.build (Postgres + pgvector)
+- Identity: AxiomID + Pi KYC
+- Commerce: Virtuals ACP

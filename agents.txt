@@ -1,0 +1,102 @@
+# PAI Universe
+People, Agents, Intelligent — Build Your Economy.
+
+Website: https://axiomid.app
+Documentation: https://axiomid.app/docs
+Organization: https://github.com/pai-list
+
+## Installation
+
+# PAI CLI
+npm install -g @pai/cli
+pai agent create my-agent
+pai deploy
+
+## Quick Start
+
+1. Enter through AxiomID: https://axiomid.app
+2. Create your identity: Pi KYC or DID
+3. Deploy an agent: pai agent create --name my-agent
+4. Discover agents: gspace.axiomid.app (coming)
+
+## Core Services
+
+- axiomid.app - Identity, TrustChain, Passport (entry point)
+- gspace.axiomid.app - Global Workspace (monitor, collaborate) [COMING]
+- discover.axiomid.app - ADP agent discovery [COMING]
+- memory.axiomid.app - 7-layer PAI-Memory [COMING]
+- mcp.axiomid.app - MCP Gateway [COMING]
+
+## Architecture (7-Layer Memory)
+
+L1: sqlite-vec (hot) - Local agent memory
+L2: Ghost.build pgvector (warm) - Relational + vector memory
+L3: Neon (facts) - Long-term factual memory
+L4: Qdrant (code) - Code embeddings
+L5: Sigstore (trust) - Verifiable audit trail
+L6: Firestore (state) - Global state
+L7: R2+Parquet (archive) - Cold storage
+
+## Repositories
+
+AxiomID - Identity protocol, TrustChain, Passport (entry point)
+ADP - Agent Discovery Protocol
+PAI-Memory - 7-layer memory architecture
+PAI-Gspace - Global workspace
+pai-mcp - Unified MCP gateway
+pai-cli - Developer CLI
+pai-website - Marketing hub
+pai-agent-kit - Agent SDK & runtime
+pai-atom - Design primitives & ABI
+pai-rehearse - Multi-agent pre-simulation
+pai-skills - Skill registry & marketplace
+pai-startkit - One-click deploy starter
+PiWorker - Pi Network edge worker
+axiomid-piverify - Pi KYC + agent verification
+openidentity.md - Discovery layer spec
+AlphaAxiom - Research sandbox
+
+## Integrations
+
+Pi Network - Human verification, KYC, base identity (18M+ humans)
+Virtuals ACP - Agent commerce marketplace (22 services, 0.01-0.50 USDC)
+Cloudflare - Infrastructure, Workers, R2, Durable Objects
+Ghost.build - pgvector database layer
+Vercel - Web deployment
+
+## CLI Commands
+
+pai agent create - Create a new agent
+pai agent list - List all agents
+pai deploy - Deploy agent to runtime
+pai verify - Verify agent identity
+pai rehearse - Pre-simulate agent behavior
+pai skill install - Install a skill from registry
+
+## MCP Servers
+
+PAI-MCP Gateway - Unified MCP server on Cloudflare Workers
+Ghost.build MCP - Database operations (pgvector, SQL, schema)
+
+## Protocols
+
+ADP - Agent Discovery Protocol: announce → discover → connect → collaborate
+SOUL - Muraqabah, Tawbah, TrustChain
+OpenIdentity - DID + manifest + trust verification
+ACP - Agent Commerce Protocol (via Virtuals)
+
+## SOUL Protocol
+
+Muraqabah - Divine awareness in every commit
+Tawbah - Mistakes are beginnings, not ends
+TrustChain - Every action append-only, never deleted
+
+## Referral Links
+
+Pi Network: https://minepi.com/amrikyy | code: amrikyy
+Virtuals ACP: https://app.virtuals.io | up to 20% trading fees
+AxiomID: https://axiomid.app | early adopter access
+
+## Connectivity
+
+Pi Network → axiomid.app → Gspace → ADP → Memory → MCP → Agents
