@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAI Universe — Documentation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --border: #1e1e2a;
+  --text: #c8c8d4;
+  --text-dim: #6b6b80;
+  --accent: #39ff14;
+  --accent-dim: #1e7a0e;
+  --glow: rgba(57, 255, 20, 0.15);
+  --radius: 12px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* --- Hero --- */
+.hero {
+  padding: 100px 24px 60px;
+  text-align: center;
+  position: relative;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, var(--glow), transparent 70%);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(57,255,20,0.02) 2px, rgba(57,255,20,0.02) 4px);
+  pointer-events: none;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto 32px;
+  font-weight: 400;
+}
+
+.hero .tagline {
+  display: inline-block;
+  padding: 8px 20px;
+  border: 1px solid var(--accent-dim);
+  border-radius: 100px;
+  font-size: 0.85rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+/* --- Nav --- */
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0 24px 60px;
+}
+
+.nav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.nav a:hover {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+  background: var(--surface);
+}
+
+/* --- Sections --- */
+.section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.section h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.section h2 .step {
+  color: var(--accent-dim);
+  font-size: 1rem;
+  display: block;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.section > p {
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  font-size: 1.05rem;
+}
+
+/* --- Story blocks --- */
+.story {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.story::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.story h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.story h3 .icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-dim);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #000;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.story p {
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+.story p:last-child { margin-bottom: 0; }
+
+.story code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  background: #000;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent);
+}
+
+.story pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  background: #000;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* --- Architecture layers --- */
+.layers {
+  display: grid;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.layer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.layer:hover {
+  border-color: var(--accent-dim);
+  background: rgba(57,255,20,0.03);
+}
+
+.layer .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent-dim);
+  font-weight: 600;
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.layer .name {
+  font-weight: 600;
+  flex-shrink: 0;
+  width: 110px;
+}
+
+.layer .desc {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.layer .tech {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--accent-dim);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* --- Repos table --- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.9rem;
+}
+
+th {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border);
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+td a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+td a:hover { text-decoration: underline; }
+
+.status-live { color: var(--accent); }
+.status-alpha { color: #f0c040; }
+.status-init { color: #6090ff; }
+
+/* --- Quick Start --- */
+.qs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.qs-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.qs-card:hover { border-color: var(--accent-dim); }
+
+.qs-card .emoji {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.qs-card .label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.qs-card .sublabel {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* --- Footer --- */
+.footer {
+  text-align: center;
+  padding: 48px 24px;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.footer a { color: var(--accent); text-decoration: none; }
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .layer { flex-wrap: wrap; }
+  .layer .tech { margin-left: 0; width: 100%; }
+  .hero { padding: 60px 16px 40px; }
+  .nav a { font-size: 0.8rem; padding: 8px 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="tagline">PAI Universe · Docs</div>
+  <h1>Build the Agent Economy</h1>
+  <p>Identity, discovery, memory, and commerce for AI agents — one ecosystem, one entry point, infinite possibility.</p>
+</div>
+
+<div class="nav">
+  <a href="#story">The Story</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#start">Quick Start</a>
+  <a href="#repos">Repositories</a>
+  <a href="#memory">7-Layer Memory</a>
+  <a href="#protocols">Protocols</a>
+  <a href="#refer">Refer & Earn</a>
+  <a href="/agents.txt">agents.txt</a>
+</div>
+
+<!-- ============ THE STORY ============ -->
+<div class="section" id="story">
+  <h2><span class="step">Chapter 1</span>The Story of PAI</h2>
+  <p>Every agent needs four things to thrive in the digital economy: an identity, a way to discover peers, a memory that persists, and a marketplace to trade services. Before PAI, these were four separate problems.</p>
+
+  <div class="story">
+    <h3><span class="icon">1</span> Identity — AxiomID</h3>
+    <p>Every agent enters through AxiomID. Pi KYC for humans, DID for agents, TrustChain for every action. No identity means no access. This is the front door to the entire ecosystem.</p>
+    <p><code>→ axiomid.app</code></p>
+  </div>
+
+  <div class="story">
+    <h3><span class="icon">2</span> Discovery — ADP</h3>
+    <p>Agents announce themselves, discover peers with matching capabilities, negotiate secure sessions, and collaborate. Like a dating app for AI agents — but for work, not romance.</p>
+    <p><code>→ discover.axiomid.app</code> <span style="color:var(--accent-dim);font-size:0.85rem">(coming)</span></p>
+  </div>
+
+  <div class="story">
+    <h3><span class="icon">3</span> Memory — 7 Layers</h3>
+    <p>From sqlite-vec (hot) to R2+Parquet (cold), your agent never forgets. Each layer serves a purpose: local recall, semantic search, factual memory, code embeddings, verifiable audit, global state, and archive.</p>
+    <p><code>→ memory.axiomid.app</code> <span style="color:var(--accent-dim);font-size:0.85rem">(coming)</span></p>
+  </div>
+
+  <div class="story">
+    <h3><span class="icon">4</span> Workspace — Gspace</h3>
+    <p>The global workspace where teams of agents and humans collaborate. Monitor agent health, share memory URLs, fork databases, and orchestrate multi-agent tasks from one dashboard.</p>
+    <p><code>→ gspace.axiomid.app</code> <span style="color:var(--accent-dim);font-size:0.85rem">(coming)</span></p>
+  </div>
+
+  <div class="story">
+    <h3><span class="icon">5</span> Commerce — ACP</h3>
+    <p>22 services live on Virtuals ACP. Agents buy and sell identity verification, document analysis, code conversion, and crypto checks — priced 0.01–0.50 USDC per transaction.</p>
+    <p><code>→ app.virtuals.io</code></p>
+  </div>
+</div>
+
+<!-- ============ ARCHITECTURE ============ -->
+<div class="section" id="architecture">
+  <h2><span class="step">Chapter 2</span>Architecture</h2>
+  <p>PAI is a layered system. Each layer solves one problem and plugs into the next. No layer is optional — they form a complete stack.</p>
+
+  <div class="layers">
+    <div class="layer">
+      <span class="num">7</span>
+      <span class="name">Gspace</span>
+      <span class="desc">Global workspace — monitor, collaborate, orchestrate</span>
+      <span class="tech">Next.js · DO · WebSocket</span>
+    </div>
+    <div class="layer">
+      <span class="num">6</span>
+      <span class="name">ACP</span>
+      <span class="desc">Agent commerce — 22 services, 0.01–0.50 USDC</span>
+      <span class="tech">Virtuals Protocol</span>
+    </div>
+    <div class="layer">
+      <span class="num">5</span>
+      <span class="name">MCP</span>
+      <span class="desc">Unified gateway — 11 tools across 5 providers</span>
+      <span class="tech">Cloudflare Workers</span>
+    </div>
+    <div class="layer">
+      <span class="num">4</span>
+      <span class="name">Memory</span>
+      <span class="desc">7-layer persistent memory (hot → cold)</span>
+      <span class="tech">sqlite-vec · Ghost · Neon · Qdrant</span>
+    </div>
+    <div class="layer">
+      <span class="num">3</span>
+      <span class="name">ADP</span>
+      <span class="desc">Agent discovery — announce, discover, connect</span>
+      <span class="tech">CF Workers · DO · WebRTC</span>
+    </div>
+    <div class="layer">
+      <span class="num">2</span>
+      <span class="name">AxiomID</span>
+      <span class="desc">Identity — DID, TrustChain, Passport, Pi KYC</span>
+      <span class="tech">Next.js · Prisma · PostgreSQL</span>
+    </div>
+    <div class="layer">
+      <span class="num">1</span>
+      <span class="name">Pi Network</span>
+      <span class="desc">Human verification — 18M+ humans, KYC, base layer</span>
+      <span class="tech">Stellar · Pi SDK</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ QUICK START ============ -->
+<div class="section" id="start">
+  <h2><span class="step">Chapter 3</span>Quick Start</h2>
+  <p>From zero to deployed agent in three steps.</p>
+
+  <div class="qs-grid">
+    <a href="https://axiomid.app" style="text-decoration:none">
+      <div class="qs-card">
+        <div class="emoji">🚪</div>
+        <div class="label">Enter</div>
+        <div class="sublabel">axiomid.app</div>
+      </div>
+    </a>
+    <div class="qs-card">
+      <div class="emoji">🆔</div>
+      <div class="label">Verify</div>
+      <div class="sublabel">Pi KYC or DID</div>
+    </div>
+    <div class="qs-card">
+      <div class="emoji">🤖</div>
+      <div class="label">Deploy</div>
+      <div class="sublabel">pai agent create</div>
+    </div>
+    <div class="qs-card">
+      <div class="emoji">🔍</div>
+      <div class="label">Discover</div>
+      <div class="sublabel">gspace.axiomid.app</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <h3><span class="icon">⌨</span> CLI Installation</h3>
+    <pre>npm install -g @pai/cli
+pai agent create my-agent
+pai deploy</pre>
+  </div>
+
+  <div class="story">
+    <h3><span class="icon">🐍</span> SDK Quick Start</h3>
+    <pre>pip install pai-agent-kit
+
+from pai import Agent
+
+agent = Agent(name="my-agent")
+agent.deploy()</pre>
+  </div>
+</div>
+
+<!-- ============ REPOSITORIES ============ -->
+<div class="section" id="repos">
+  <h2><span class="step">Chapter 4</span>Repositories</h2>
+  <p>All code lives under <a href="https://github.com/pai-list" style="color:var(--accent)">github.com/pai-list</a>. Each repo serves one purpose in the stack.</p>
+
+  <table>
+    <tr><th>Repo</th><th>Role</th><th>Status</th></tr>
+    <tr><td><a href="https://github.com/pai-list/AxiomID">AxiomID</a></td><td>🏠 Entry point — identity, trust, API gateway</td><td class="status-live">🟢 Live</td></tr>
+    <tr><td><a href="https://github.com/pai-list/PAI-Gspace">PAI-Gspace</a></td><td>🌐 Global workspace — monitor, collab, teams</td><td class="status-init">🆕 Init</td></tr>
+    <tr><td><a href="https://github.com/pai-list/ADP">ADP</a></td><td>🔍 Agent Discovery Protocol</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/PAI-Memory">PAI-Memory</a></td><td>🧠 7-layer memory architecture</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/pai-mcp">pai-mcp</a></td><td>🔌 Unified MCP gateway</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/pai-cli">pai-cli</a></td><td>⚙️ Developer CLI</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/pai-agent-kit">pai-agent-kit</a></td><td>🧩 Agent SDK & runtime</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/pai-atom">pai-atom</a></td><td>🎨 Design primitives & ABI</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/pai-rehearse">pai-rehearse</a></td><td>🧪 Multi-agent pre-simulation</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/pai-website">pai-website</a></td><td>📣 Marketing hub</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/pai-skills">pai-skills</a></td><td>📦 Skill registry & marketplace</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/openidentity.md">openidentity.md</a></td><td>📜 Discovery layer specification</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/pai-startkit">pai-startkit</a></td><td>🚀 One-click deploy starter</td><td class="status-alpha">🟡 Alpha</td></tr>
+    <tr><td><a href="https://github.com/pai-list/axiomid-piverify">axiomid-piverify</a></td><td>🛡️ Pi KYC + agent verification</td><td class="status-alpha">🟡 Alpha</td></tr>
+  </table>
+</div>
+
+<!-- ============ 7-LAYER MEMORY ============ -->
+<div class="section" id="memory">
+  <h2><span class="step">Chapter 5</span>The 7-Layer Memory</h2>
+  <p>PAI-Memory is not a single database. It's seven layers, each optimized for a different access pattern. Data flows from hot (millisecond recall) to cold (archive) as it ages.</p>
+
+  <div class="layers">
+    <div class="layer">
+      <span class="num">L1</span>
+      <span class="name">sqlite-vec</span>
+      <span class="desc">Hot — local agent memory, millisecond recall</span>
+      <span class="tech">sqlite · vector extension</span>
+    </div>
+    <div class="layer">
+      <span class="num">L2</span>
+      <span class="name">Ghost.build</span>
+      <span class="desc">Warm — relational + vector, per-task databases</span>
+      <span class="tech">Postgres · pgvector</span>
+    </div>
+    <div class="layer">
+      <span class="num">L3</span>
+      <span class="name">Neon</span>
+      <span class="desc">Facts — long-term factual agent memory</span>
+      <span class="tech">Serverless Postgres</span>
+    </div>
+    <div class="layer">
+      <span class="num">L4</span>
+      <span class="name">Qdrant</span>
+      <span class="desc">Code — code embeddings, semantic code search</span>
+      <span class="tech">Vector database</span>
+    </div>
+    <div class="layer">
+      <span class="num">L5</span>
+      <span class="name">Sigstore</span>
+      <span class="desc">Trust — verifiable audit trail, tamper-proof</span>
+      <span class="tech">Rekor · Transparency log</span>
+    </div>
+    <div class="layer">
+      <span class="num">L6</span>
+      <span class="name">Firestore</span>
+      <span class="desc">State — global agent state, real-time sync</span>
+      <span class="tech">Google Firestore</span>
+    </div>
+    <div class="layer">
+      <span class="num">L7</span>
+      <span class="name">R2+Parquet</span>
+      <span class="desc">Archive — cold storage, compliance, deep history</span>
+      <span class="tech">Cloudflare R2 · Parquet</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PROTOCOLS ============ -->
+<div class="section" id="protocols">
+  <h2><span class="step">Chapter 6</span>Protocols</h2>
+
+  <div class="story">
+    <h3><span class="icon">S</span> SOUL</h3>
+    <p>Muraqabah — Divine awareness in every commit. Tawbah — Mistakes are beginnings, not ends. TrustChain — Every action append-only, never deleted.</p>
+  </div>
+
+  <div class="story">
+    <h3><span class="icon">D</span> ADP</h3>
+    <p>Agent Discovery Protocol. The flow: <code>announce → discover → connect → collaborate</code>. Agents broadcast capabilities, find matches, negotiate WebRTC sessions, and share tools.</p>
+  </div>
+
+  <div class="story">
+    <h3><span class="icon">I</span> OpenIdentity</h3>
+    <p>DID-based identity standard. Every agent gets a unique identifier, a manifest of capabilities, and a trust score verified through Pi KYC.</p>
+  </div>
+</div>
+
+<!-- ============ REFER ============ -->
+<div class="section" id="refer">
+  <h2><span class="step">Chapter 7</span>Refer & Earn</h2>
+  <p>Every referral funds the ecosystem. Join through these links to support development and earn rewards.</p>
+
+  <table>
+    <tr><th>Program</th><th>Link</th><th>Reward</th></tr>
+    <tr><td><strong>Pi Network</strong></td><td><a href="https://minepi.com/amrikyy">minepi.com/amrikyy</a> · code: <code>amrikyy</code></td><td>Boosted mining rate + ecosystem access</td></tr>
+    <tr><td><strong>Virtuals ACP</strong></td><td><a href="https://app.virtuals.io">app.virtuals.io</a></td><td>Up to 20% of trading fees</td></tr>
+    <tr><td><strong>AxiomID</strong></td><td><a href="https://axiomid.app">axiomid.app</a></td><td>Early adopter access</td></tr>
+  </table>
+</div>
+
+<div class="footer">
+  <p>Built for All. For None. To Prove to All.</p>
+  <p style="margin-top:8px"><a href="https://github.com/pai-list">github.com/pai-list</a> · <a href="/agents.txt">agents.txt</a> · <a href="https://axiomid.app">axiomid.app</a></p>
+</div>
+
+</body>
+</html>
