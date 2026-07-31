@@ -1,0 +1,94 @@
+name: Reusable Vercel Deploy (CD)
+description: Production deploy to Vercel on push to main (or manual dispatch)
+on:
+  workflow_call:
+    inputs:
+      project-id:
+        description: "Vercel project ID (or secret name holding it)"
+        required: true
+        type: string
+      vercel-org-id-secret:
+        description: "Name of the repo secret holding the Vercel org ID"
+        required: false
+        type: string
+        default: "VERCEL_ORG_ID"
+      vercel-token-secret:
+        description: "Name of the repo secret holding the Vercel token"
+        required: false
+        type: string
+        default: "VERCEL_TOKEN"
+      build-command:
+        description: "Override build command"
+        required: false
+        type: string
+        default: ""
+      install-command:
+        description: "Override install command"
+        required: false
+        type: string
+        default: ""
+      output-dir:
+        description: "Build output directory"
+        required: false
+        type: string
+        default: ".next"
+      node-version:
+        description: "Node.js version"
+        required: false
+        type: string
+        default: "22"
+    secrets:
+      VERCEL_TOKEN:
+        required: true
+      VERCEL_ORG_ID:
+        required: true
+
+jobs:
+  vercel-deploy:
+    name: Vercel Production Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - name: Resolve project ID
+        id: project
+        run: |
+          # project-id can be the literal ID or a secret name (VERCEL_PROJECT_ID_*)
+          PID="${{ inputs.project-id }}"
+          if [[ "$PID" == VERCEL_PROJECT_ID_* ]]; then
+            PID="${!PID}"
+          fi
+          echo "pid=$PID" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Vercel (Production)
+        uses: amondnet/vercel-action@6b13b6161797436a73c9c5dc2a1b2d7d7d0f0b42 # v25.1.0
+        id: vercel-deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ steps.project.outputs.pid }}
+          vercel-args: "--prod"
+          working-directory: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-deployment: true
+          github-deployment-env: production
+
+      - name: Post deployment summary
+        run: |
+          echo "## 🚀 Vercel Production Deploy" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Preview URL**: ${{ steps.vercel-deploy.outputs.preview-url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Deployment URL**: ${{ steps.vercel-deploy.outputs.deployment-url }}" >> "$GITHUB_STEP_SUMMARY"
