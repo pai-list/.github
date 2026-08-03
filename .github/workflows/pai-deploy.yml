@@ -1,0 +1,60 @@
+name: PAI Deploy Pipeline (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      run-e2e:
+        description: 'Run E2E tests after deploy'
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Detect Platform
+        id: detect
+        run: |
+          PLATFORM=""
+          if [ -f "wrangler.jsonc" ] || [ -f "wrangler.toml" ]; then
+            PLATFORM="${PLATFORM}cloudflare,"
+          fi
+          if [ -f "vercel.json" ]; then
+            PLATFORM="${PLATFORM}vercel,"
+          fi
+          PLATFORM=${PLATFORM%,}
+          echo "platform=$PLATFORM" >> $GITHUB_OUTPUT
+      
+      - name: Deploy to Cloudflare Pages
+        if: contains(steps.detect.outputs.platform, 'cloudflare')
+        uses: cloudflare/pages-action@1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ github.event.repository.name }}
+          directory: ./dist
+          branch: production
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Deploy to Vercel
+        if: contains(steps.detect.outputs.platform, 'vercel')
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod=true'
+      
+      - name: Run E2E Tests
+        if: ${{ inputs.run-e2e }}
+        run: |
+          npx playwright install --with-deps chromium
+          pnpm test:e2e --project=chromium
+        env:
+          PLAYWRIGHT_TIMEOUT: 120000
