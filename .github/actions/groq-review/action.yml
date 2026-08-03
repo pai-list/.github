@@ -1,0 +1,130 @@
+name: Groq Code Review
+description: >-
+  Run a layer-scoped LLM review via Groq. Composite action used by PAI layered
+  review roles (CRAI-F inspired distributed review). Reviews only the files
+  passed in changed-files for the role's layer.
+
+inputs:
+  groq-api-key:
+    description: Groq API key
+    required: true
+  model:
+    description: Groq model id
+    required: false
+    default: llama-3.3-70b-versatile
+  role-name:
+    description: Name of the review role (identity-engineer, etc.)
+    required: true
+  role-prompt:
+    description: Role-specific review instructions
+    required: true
+  changed-files:
+    description: Newline-delimited list of changed files scoped to this role
+    required: true
+
+outputs:
+  pass:
+    description: "true if risk < 70"
+    value: ${{ steps.review.outputs.pass }}
+  risk:
+    description: "0..100 risk score"
+    value: ${{ steps.review.outputs.risk }}
+  findings-json:
+    description: JSON array of findings
+    value: ${{ steps.review.outputs.findings-json }}
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Run Groq review for role
+      id: review
+      shell: bash
+      env:
+        GROQ_API_KEY: ${{ inputs.groq-api-key }}
+        ROLE: ${{ inputs.role-name }}
+        ROLE_PROMPT: ${{ inputs.role-prompt }}
+        CHANGED_FILES: ${{ inputs.changed-files }}
+        MODEL: ${{ inputs.model }}
+      run: |
+        python3 - <<'PYEOF'
+        import json
+        import os
+        import subprocess
+        import sys
+
+        role = os.environ.get("ROLE", "reviewer")
+        model = os.environ.get("MODEL", "llama-3.3-70b-versatile")
+        api_key = os.environ.get("GROQ_API_KEY", "")
+        role_prompt = os.environ.get("ROLE_PROMPT", "")
+        changed = [p for p in os.environ.get("CHANGED_FILES", "").splitlines() if p]
+
+        github_output = os.environ.get("GITHUB_OUTPUT", "")
+
+        def emit(pass_, risk, findings):
+            line = json.dumps({"pass": pass_, "risk": risk, "findings": findings})
+            if github_output:
+                with open(github_output, "a") as fh:
+                    fh.write(f"pass={str(pass_).lower()}\n")
+                    fh.write(f"risk={risk}\n")
+                    fh.write(f"findings-json={line}\n")
+            print(f"ROLE={role} PASS={pass_} RISK={risk} FINDINGS={len(findings)}")
+
+        if not api_key:
+            print("GROQ_API_KEY not set — review skipped")
+            emit(True, 0, [])
+            sys.exit(0)
+
+        if not changed:
+            print("No changed files for role — skipped")
+            emit(True, 0, [])
+            sys.exit(0)
+
+        cmd = ["git", "diff", "origin/main...HEAD", "--"] + changed
+        diff = subprocess.run(cmd, capture_output=True, text=True).stdout[:12000]
+        if not diff.strip():
+            print("No diff for role files — skipped")
+            emit(True, 0, [])
+            sys.exit(0)
+
+        prompt = (
+            f"ROLE: PAI {role}. {role_prompt}\n\n"
+            "Return ONLY a JSON object: "
+            '{"ok":bool,"risk":0..100,"findings":[{"severity":"critical|high|medium|low","file":"...","line":123,"issue":"...","layer":"..."}],"summary":"..."}\n\n'
+            f"Diff:\n{diff}"
+        )
+
+        import urllib.request
+
+        payload = json.dumps({
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 1800,
+            "temperature": 0.1,
+        }).encode()
+
+        req = urllib.request.Request(
+            "https://api.groq.com/openai/v1/chat/completions",
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+        )
+        try:
+            resp = json.loads(urllib.request.urlopen(req, timeout=45).read())
+            text = resp["choices"][0]["message"]["content"]
+            js = text[text.find("{") : text.rfind("}") + 1]
+            data = json.loads(js)
+        except Exception as exc:
+            print(f"REQUEST_FAILED={exc}")
+            data = {"ok": True, "risk": 0, "findings": []}
+
+        risk = int(data.get("risk", 0))
+        findings = data.get("findings", [])
+        emit(risk < 70, risk, findings)
+        PYEOF

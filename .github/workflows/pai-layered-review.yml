@@ -1,0 +1,249 @@
+name: PAI Layered Review Roles (CRAI-F inspired)
+
+# Distributed, layer-scoped review.
+#
+# CRAI-F lesson: don't let ONE reviewer be the single gate (UX-centrality
+# 0.72 -> distributed). Instead, 5 layer-expert "engineers" each own one
+# lane; an aggregation job + PR comment is the accountability loop
+# (community vetting / stakeholder feedback).
+#
+# Roles:
+#   identity-engineer    -> L1/L2 identity: DID, TrustChain, Passport, Pi auth
+#   runtime-engineer     -> L3 agent runtime: workers, DOs, SDK
+#   memory-engineer      -> L5 memory: D1, Vectorize, L2/L3 episodic/semantic
+#   skill-engineer       -> Skills: skill registry, ABI, MCP tools
+#   governance-engineer  -> cross-cutting: SOUL protocol, licenses, workflows
+#
+# Invoked via workflow_call from any PAI repo. Requires GROQ_API_KEY.
+# Uses the PAI groq-review composite action. No central bottleneck role.
+
+on:
+  workflow_call:
+    inputs:
+      base-ref:
+        description: Base ref for the diff
+        required: false
+        default: "main"
+      post-comment:
+        description: Post a PR comment with role findings
+        required: false
+        default: true
+        type: boolean
+    secrets:
+      GROQ_API_KEY:
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  classify:
+    name: Detect changed layers
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      identity: ${{ steps.class.outputs.identity }}
+      runtime: ${{ steps.class.outputs.runtime }}
+      memory: ${{ steps.class.outputs.memory }}
+      skill: ${{ steps.class.outputs.skill }}
+      governance: ${{ steps.class.outputs.governance }}
+      identity_files: ${{ steps.class.outputs.identity_files }}
+      runtime_files: ${{ steps.class.outputs.runtime_files }}
+      memory_files: ${{ steps.class.outputs.memory_files }}
+      skill_files: ${{ steps.class.outputs.skill_files }}
+      governance_files: ${{ steps.class.outputs.governance_files }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Classify changed files
+        id: class
+        run: |
+          if [ -n "${{ inputs.base-ref }}" ]; then
+            BASE="${{ inputs.base-ref }}"
+          else
+            BASE="${{ github.event.pull_request.base.sha || github.event.before || 'main' }}"
+          fi
+
+          git fetch origin "$BASE" -q 2>/dev/null || true
+          CHANGED=$(git diff --name-only "origin/$BASE" HEAD 2>/dev/null || git diff --name-only "$BASE" HEAD)
+
+          identity_files=""
+          runtime_files=""
+          memory_files=""
+          skill_files=""
+          governance_files=""
+
+          echo "$CHANGED" | grep -iE 'did|trustchain|passport|kyc|piverif|identity|soul|pi-sdk|pi-network' \
+            && identity_files=$(echo "$CHANGED" | grep -iE 'did|trustchain|passport|kyc|piverif|identity|soul|pi-sdk|pi-network') || true
+          echo "$CHANGED" | grep -iE 'worker|durable|entrypoint|runtime|agent-kit|piworker' \
+            && runtime_files=$(echo "$CHANGED" | grep -iE 'worker|durable|entrypoint|runtime|agent-kit|piworker') || true
+          echo "$CHANGED" | grep -iE 'memory|l[0-9]-do|vector|d1|sqlite|semantic|episodic' \
+            && memory_files=$(echo "$CHANGED" | grep -iE 'memory|l[0-9]-do|vector|d1|sqlite|semantic|episodic') || true
+          echo "$CHANGED" | grep -iE 'skill|abi|registry|mcp|pai-skills|atom' \
+            && skill_files=$(echo "$CHANGED" | grep -iE 'skill|abi|registry|mcp|pai-skills|atom') || true
+          echo "$CHANGED" | grep -iE 'soul|govern|licens|security|workflow|\.github|readme' \
+            && governance_files=$(echo "$CHANGED" | grep -iE 'soul|govern|licens|security|workflow|\.github|readme') || true
+
+          [ -n "$identity_files" ] && echo "identity=true" >> "$GITHUB_OUTPUT" || echo "identity=false" >> "$GITHUB_OUTPUT"
+          [ -n "$runtime_files" ] && echo "runtime=true" >> "$GITHUB_OUTPUT" || echo "runtime=false" >> "$GITHUB_OUTPUT"
+          [ -n "$memory_files" ] && echo "memory=true" >> "$GITHUB_OUTPUT" || echo "memory=false" >> "$GITHUB_OUTPUT"
+          [ -n "$skill_files" ] && echo "skill=true" >> "$GITHUB_OUTPUT" || echo "skill=false" >> "$GITHUB_OUTPUT"
+          [ -n "$governance_files" ] && echo "governance=true" >> "$GITHUB_OUTPUT" || echo "governance=false" >> "$GITHUB_OUTPUT"
+
+          echo "identity_files=$(printf '%s\n' "$identity_files" | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+          echo "runtime_files=$(printf '%s\n' "$runtime_files" | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+          echo "memory_files=$(printf '%s\n' "$memory_files" | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+          echo "skill_files=$(printf '%s\n' "$skill_files" | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+          echo "governance_files=$(printf '%s\n' "$governance_files" | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+
+  identity-engineer:
+    name: Identity Engineer (L1/L2)
+    runs-on: ubuntu-latest
+    needs: classify
+    if: needs.classify.outputs.identity == 'true'
+    timeout-minutes: 10
+    outputs:
+      pass: ${{ steps.review.outputs.pass }}
+      risk: ${{ steps.review.outputs.risk }}
+      findings-json: ${{ steps.review.outputs.findings-json }}
+    steps:
+      - name: Review identity layer
+        id: review
+        uses: ./.github/actions/groq-review
+        with:
+          groq-api-key: ${{ secrets.GROQ_API_KEY }}
+          role-name: identity-engineer
+          role-prompt: |
+            CRAI-F Identity lane. Checks:
+            1. DID resolution / did:axiom — no central registry lock-in
+            2. TrustChain append-only semantics — no delete/truncate, hash chains
+            3. Pi auth: Pi SDK token verification MUST be server-side, never trust client-only
+            4. Secret handling — no leaked keys, no fallback secrets, no hardcoded sandbox mode
+            5. SOUL/Identity SOUL protocol adherence
+          changed-files: ${{ needs.classify.outputs.identity_files }}
+
+  runtime-engineer:
+    name: Runtime Engineer (L3)
+    runs-on: ubuntu-latest
+    needs: classify
+    if: needs.classify.outputs.runtime == 'true'
+    timeout-minutes: 10
+    outputs:
+      runtime: ${{ steps.review.outputs.pass }}
+      risk: ${{ steps.review.outputs.risk }}
+      findings-json: ${{ steps.review.outputs.findings-json }}
+    steps:
+      - name: Review runtime layer
+        id: review
+        uses: ./.github/actions/groq-review
+        with:
+          groq-api-key: ${{ secrets.GROQ_API_KEY }}
+          role-name: runtime-engineer
+          role-prompt: |
+            CRAI/IRIDIUM Runtime lane. Checks:
+            1. Worker/DO entrypoints: alarms, waitUntil, no unhandled concurrency
+            2. Agent SDK: strict TS, no `as any`, env-based secrets only
+            3. Cloudflare D1/KV/Durable Object patterns correct
+            4. No global mutable state in Worker path
+          changed-files: ${{ needs.classify.outputs.runtime_files }}
+
+  memory-engineer:
+    name: Memory Engineer (L5)
+    runs-on: ubuntu-latest
+    needs: classify
+    if: needs.classify.outputs.memory == 'true'
+    timeout-minutes: 10
+    outputs:
+      memory: ${{ steps.review.outputs.pass }}
+      risk: ${{ steps.review.outputs.risk }}
+      findings-json: ${{ steps.review.outputs.findings-json }}
+    steps:
+      - name: Review memory layer
+        id: review
+        uses: ./.github/actions/groq-review
+        with:
+          groq-api-key: ${{ secrets.GROQ_API_KEY }}
+          role-name: memory-engineer
+          role-prompt: |
+            CRAI/Enculturation Memory lane. Checks:
+            1. D1 schema migrations — append-only, no destructive DDL
+            2. Vectorize index/similarity — embedding freshness + culture-aware metadata
+            3. Episodic vs semantic separation, privacy of PII
+            4. Memory-bound access control — per-identity isolation
+          changed-files: ${{ needs.classify.outputs.memory_files }}
+
+  skill-engineer:
+    name: Skill Engineer (Skills/MCP)
+    runs-on: ubuntu-latest
+    needs: classify
+    if: needs.classify.outputs.skill == 'true'
+    timeout-minutes: 10
+    outputs:
+      skill: ${{ steps.review.outputs.pass }}
+      risk: ${{ steps.review.outputs.risk }}
+      findings-json: ${{ steps.review.outputs.findings-json }}
+    steps:
+      - name: Review skill layer
+        id: review
+        uses: ./.github/actions/groq-review
+        with:
+          groq-api-key: ${{ secrets.GROQ_API_KEY }}
+          role-name: skill-engineer
+          role-prompt: |
+            CRAI/Skill lane. Checks:
+            1. Skill ABI/registry schema — id, version, entrypoint, permission model
+            2. MCP tools — no shell injection, input validation
+            3. Skill isolation — no cross-tenant memory sharing
+            4. Skills must declare required OAuth/secret scope
+          changed-files: ${{ needs.classify.outputs.skill_files }}
+
+  governance-engineer:
+    name: Governance Engineer (cross-cutting)
+    runs-on: ubuntu-latest
+    needs: classify
+    if: needs.classify.outputs.governance == 'true'
+    timeout-minutes: 10
+    outputs:
+      governance: ${{ steps.review.outputs.pass }}
+      risk: ${{ steps.review.outputs.risk }}
+      findings-json: ${{ steps.review.outputs.findings-json }}
+    steps:
+      - name: Review governance layer
+        id: review
+        uses: ./.github/actions/groq-review
+        with:
+          groq-api-key: ${{ secrets.GROQ_API_KEY }}
+          role-name: governance-engineer
+          role-prompt: |
+            CRAI/Governance lane (accountability). Checks:
+            1. SOUL protocol / Muraqabah — no hidden backdoors, honest logging
+            2. Licenses present, no secrets in workflow files
+            3. CI/CD guardrails — no secret-echo steps, pinned actions
+            4. Ethics embedded in dev loop — community vetting note required
+          changed-files: ${{ needs.classify.outputs.governance_files }}
+
+  post-comment:
+    name: Aggregate role findings
+    runs-on: ubuntu-latest
+    needs: [identity-engineer, runtime-engineer, memory-engineer, skill-engineer, governance-engineer]
+    if: ${{ inputs.post-comment }} && always()
+    timeout-minutes: 5
+    steps:
+      - name: Aggregate
+        run: |
+          echo "# PAI Layered Review (distributed roles)" > /tmp/roles.md
+          echo "" >> /tmp/roles.md
+          echo "| Role | Pass | Risk | |" >> /tmp/roles.md
+          echo "|---|---|---|--|" >> /tmp/roles.md
+          echo "| Identity | ${{ needs.identity-engineer.outputs.pass || 'skipped' }} | ${{ needs.identity-engineer.outputs.risk || '-' }} | |" >> /tmp/roles.md
+          echo "| Runtime | ${{ needs.runtime-engineer.outputs.pass || 'skipped' }} | ${{ needs.runtime-engineer.outputs.risk || '-' }} | |" >> /tmp/roles.md
+          echo "| Memory | ${{ needs.memory-engineer.outputs.pass || 'skipped' }} | ${{ needs.memory-engineer.outputs.risk || '-' }} | |" >> /tmp/roles.md
+          echo "| Skill | ${{ needs.skill-engineer.outputs.pass || 'skipped' }} | ${{ needs.skill-engineer.outputs.risk || '-' }} | |" >> /tmp/roles.md
+          echo "| Governance | ${{ needs.governance-engineer.outputs.pass || 'skipped' }} | ${{ needs.governance-engineer.outputs.risk || '-' }} | |" >> /tmp/roles.md
+          echo "" >> /tmp/roles.md
+          echo "No single reviewer is the bottleneck — each layer has its own engineer (CRAI-F distributed centrality)." >> /tmp/roles.md
+          echo "done"

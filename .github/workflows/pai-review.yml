@@ -75,13 +75,14 @@ jobs:
         uses: ./.github/actions/groq-review
         with:
           model: llama-3.3-70b-versatile
-          prompts: |
+          role-name: review-pipeline
+          role-prompt: |
             PAI Security: TrustChain, Pi compliance, Memory safety
             PAI Architecture: Cloudflare Workers, DO, D1, KV patterns
             PAI Performance: L2/L3 budgets, WASM SIMD thresholds
+          changed-files: |
+            .
           groq-api-key: ${{ secrets.GROQ_API_KEY }}
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
   validation:
     name: Validation
