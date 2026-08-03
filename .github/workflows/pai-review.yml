@@ -1,0 +1,228 @@
+name: PAI Review Pipeline (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      platform:
+        description: 'Target platform (auto-detected if not provided)'
+        type: string
+        required: false
+
+jobs:
+  detect-platform:
+    name: Detect Platform
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      platform: ${{ steps.detect.outputs.platform }}
+      is-cloudflare: ${{ steps.detect.outputs.is-cloudflare }}
+      is-vercel: ${{ steps.detect.outputs.is-vercel }}
+      is-pi: ${{ steps.detect.outputs.is-pi }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Detect Platform
+        id: detect
+        run: |
+          PLATFORM=""
+          IS_CLOUDFLARE=false
+          IS_VERCEL=false
+          IS_PI=false
+          
+          if [ -f "wrangler.jsonc" ] || [ -f "wrangler.toml" ]; then
+            IS_CLOUDFLARE=true
+            PLATFORM="${PLATFORM}cloudflare,"
+          fi
+          
+          if [ -f "vercel.json" ]; then
+            IS_VERCEL=true
+            PLATFORM="${PLATFORM}vercel,"
+          fi
+          
+          if grep -q '"@pi-network/sdk"\|"pi-sdk"' package.json 2>/dev/null; then
+            IS_PI=true
+            PLATFORM="${PLATFORM}pi,"
+          fi
+          
+          PLATFORM=${PLATFORM%,}
+          
+          if [ -n "${{ inputs.platform }}" ]; then
+            PLATFORM="${{ inputs.platform }}"
+          fi
+          
+          echo "platform=$PLATFORM" >> $GITHUB_OUTPUT
+          echo "is-cloudflare=$IS_CLOUDFLARE" >> $GITHUB_OUTPUT
+          echo "is-vercel=$IS_VERCEL" >> $GITHUB_OUTPUT
+          echo "is-pi=$IS_PI" >> $GITHUB_OUTPUT
+          echo "Detected platform: $PLATFORM"
+
+  code-review:
+    name: Code Review (Groq)
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    needs: detect-platform
+    outputs:
+      risk-score: ${{ steps.groq.outputs.risk-score }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run Groq Review (llama-3.3-70b)
+        id: groq
+        uses: ./.github/actions/groq-review
+        with:
+          model: llama-3.3-70b-versatile
+          prompts: |
+            PAI Security: TrustChain, Pi compliance, Memory safety
+            PAI Architecture: Cloudflare Workers, DO, D1, KV patterns
+            PAI Performance: L2/L3 budgets, WASM SIMD thresholds
+          groq-api-key: ${{ secrets.GROQ_API_KEY }}
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
+  validation:
+    name: Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    needs: detect-platform
+    outputs:
+      risk-score: ${{ steps.validate.outputs.risk-score }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      
+      - name: Install @pai/validators
+        run: npm install @pai/validators@latest
+      
+      - name: Run Platform Validators
+        id: validate
+        run: |
+          PLATFORM="${{ needs.detect-platform.outputs.platform }}"
+          
+          node -e "
+            const validators = [];
+            
+            const { AgentAppValidator } = require('@pai/validators');
+            validators.push({ name: 'AgentApp', v: new AgentAppValidator() });
+            
+            if ('${{ needs.detect-platform.outputs.is-cloudflare }}' === 'true') {
+              const { CloudflareValidator } = require('@pai/validators');
+              validators.push({ name: 'Cloudflare', v: new CloudflareValidator() });
+            }
+            
+            if ('${{ needs.detect-platform.outputs.is-vercel }}' === 'true') {
+              const { VercelValidator } = require('@pai/validators');
+              validators.push({ name: 'Vercel', v: new VercelValidator() });
+            }
+            
+            if ('${{ needs.detect-platform.outputs.is-pi }}' === 'true') {
+              const { PiAppValidator } = require('@pai/validators');
+              validators.push({ name: 'Pi', v: new PiAppValidator() });
+            }
+            
+            (async () => {
+              let maxRisk = 0;
+              let allPassed = true;
+              
+              for (const { name, v } of validators) {
+                const result = await v.validate(process.cwd());
+                console.log(name + ' validation:', result.passed ? 'PASSED' : 'FAILED');
+                if (!result.passed) {
+                  allPassed = false;
+                  result.errors?.forEach(e => console.log('::error::' + e));
+                }
+                if (result.riskScore !== undefined) {
+                  maxRisk = Math.max(maxRisk, result.riskScore);
+                }
+              }
+              
+              console.log('MAX_RISK=' + maxRisk);
+              process.env.GITHUB_OUTPUT && require('fs').appendFileSync(process.env.GITHUB_OUTPUT, 'risk-score=' + maxRisk + '\\n');
+              
+              if (maxRisk >= 80) {
+                console.log('::error::Risk score ' + maxRisk + ' exceeds threshold (80)');
+                process.exit(1);
+              }
+              if (!allPassed) {
+                process.exit(1);
+              }
+            })();
+          "
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    needs: detect-platform
+    outputs:
+      risk-score: ${{ steps.scan.outputs.risk-score }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Run npm audit
+        id: scan
+        run: |
+          AUDIT=$(npm audit --json 2>/dev/null || echo '{"vulnerabilities":{}}')
+          HIGH=$(echo "$AUDIT" | jq '.vulnerabilities | map(select(.severity=="high" or .severity=="critical")) | length')
+          RISK=$((HIGH * 5))
+          echo "risk-score=$RISK" >> $GITHUB_OUTPUT
+          if [ "$HIGH" -gt 0 ]; then
+            echo "::warning::Found $HIGH high/critical vulnerabilities (risk: $RISK)"
+          fi
+      
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+
+  risk-gate:
+    name: Risk Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [code-review, validation, security-scan]
+    if: always()
+    steps:
+      - name: Aggregate Risk Scores
+        id: aggregate
+        run: |
+          CODE_REVIEW_RISK=${{ needs.code-review.outputs.risk-score || 0 }}
+          VALIDATION_RISK=${{ needs.validation.outputs.risk-score || 0 }}
+          SECURITY_RISK=${{ needs.security-scan.outputs.risk-score || 0 }}
+          
+          TOTAL=$((CODE_REVIEW_RISK + VALIDATION_RISK + SECURITY_RISK))
+          
+          echo "total-risk=$TOTAL" >> $GITHUB_OUTPUT
+          echo "Code Review Risk: $CODE_REVIEW_RISK"
+          echo "Validation Risk: $VALIDATION_RISK"
+          echo "Security Risk: $SECURITY_RISK"
+          echo "TOTAL RISK: $TOTAL / 80"
+          
+          if [ "$TOTAL" -gt 80 ]; then
+            echo "::error::Aggregate risk score $TOTAL exceeds threshold (80). Merge blocked."
+            exit 1
+          fi
