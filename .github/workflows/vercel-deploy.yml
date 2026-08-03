@@ -73,20 +73,22 @@ jobs:
           echo "pid=$PID" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Vercel (Production)
-        uses: amondnet/vercel-action@v25.1.0
         id: vercel-deploy
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ steps.project.outputs.pid }}
-          vercel-args: "--prod"
-          working-directory: .
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          github-deployment: true
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ steps.project.outputs.pid }}
+        run: |
+          npm i -g vercel@latest >/dev/null 2>&1
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN" >/dev/null 2>&1
+          vercel build --prod --token="$VERCEL_TOKEN" 2>&1 | tail -3
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" --yes > .vercel/deploy-url.txt 2>&1
+          URL=$(tail -1 .vercel/deploy-url.txt)
+          echo "deployment-url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Deployed: $URL"
 
       - name: Post deployment summary
         run: |
           echo "## 🚀 Vercel Production Deploy" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Preview URL**: ${{ steps.vercel-deploy.outputs.preview-url }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Deployment URL**: ${{ steps.vercel-deploy.outputs.deployment-url }}" >> "$GITHUB_STEP_SUMMARY"
