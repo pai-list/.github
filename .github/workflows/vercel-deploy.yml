@@ -1,5 +1,4 @@
 name: Reusable Vercel Deploy (CD)
-description: Production deploy to Vercel on push to main (or manual dispatch)
 on:
   workflow_call:
     inputs:
