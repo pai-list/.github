@@ -6,6 +6,10 @@ on:
         description: "Vercel project ID (or secret name holding it)"
         required: true
         type: string
+      project-name:
+        description: "Vercel project name/slug (for vercel link)"
+        required: true
+        type: string
       vercel-org-id-secret:
         description: "Name of the repo secret holding the Vercel org ID"
         required: false
@@ -79,10 +83,12 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ steps.project.outputs.pid }}
         run: |
+          set -e
           npm i -g vercel@latest >/dev/null 2>&1
-          vercel pull --yes --environment=production --token="$VERCEL_TOKEN" >/dev/null 2>&1
-          vercel build --prod --token="$VERCEL_TOKEN" 2>&1 | tail -3
-          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" --yes > .vercel/deploy-url.txt 2>&1
+          vercel link --yes --project "${{ inputs.project-name }}" --scope "$VERCEL_ORG_ID" --token "$VERCEL_TOKEN" >/dev/null 2>&1 || true
+          vercel pull --yes --environment=production --scope "$VERCEL_ORG_ID" --token "$VERCEL_TOKEN" 2>&1 | tail -2
+          vercel build --prod --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" 2>&1 | tail -6
+          vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" --yes > .vercel/deploy-url.txt 2>&1
           URL=$(tail -1 .vercel/deploy-url.txt)
           echo "deployment-url=$URL" >> "$GITHUB_OUTPUT"
           echo "Deployed: $URL"
