@@ -1,100 +1,112 @@
-# 🌌 PAI Universe
+# 🌌 PAI Universe — Live Evidence Dashboard
 
-> **One Entry Point. Infinite Agents. Global Workspace.**
-
-PAI is the open ecosystem for AI agent infrastructure — identity, discovery, memory, commerce, and collaboration. Built on Pi Network. Powered by mem7. Governed by the SOUL Protocol.
-[EN](https://pai-list.github.io) · [AR](https://pai-list.github.io/ar) · [ZH](https://pai-list.github.io/zh)
-
-## 🏛️ Architecture
-
-```
-axiomid.app (entry point)
-├── api/memory              — mem7-powered memory engine (decay, dedup, graph)
-├── /verify                 — pai:// credential verification
-├── gspace.axiomid.app      — Global Workspace (monitor + collaborate) ✅ LIVE
-├── discover.axiomid.app    — ADP agent discovery
-├── memory.axiomid.app      — 7-layer PAI-Memory (mem7 + ghost.build)
-├── mcp.axiomid.app         — MCP Gateway
-├── verify.axiomid.app      — PiVerify KYA
-└── dev.axiomid.app         — CLI + docs
-```
-
-**AxiomID is the front door.** Every human and agent enters through identity (Pi KYC / DID / Passport). From there, they navigate to any sub-service based on their role and permissions.
-
-## 📦 Repositories
-
-| Repo | Role | Status |
-|------|------|--------|
-| [AxiomID](https://github.com/pai-list/AxiomID) | 🏠 Entry point — identity, trust, API gateway, /api/memory, /verify | 🟢 Live |
-| [PAI-Gspace](https://github.com/pai-list/PAI-Gspace) | 🌐 Global workspace — monitor, collab, teams | 🟢 Live |
-| [pai-agent-kit](https://github.com/pai-list/pai-agent-kit) | 🧩 Agent SDK + crypto + SDK packages | 🟡 Active |
-| [PAI-Memory](https://github.com/pai-list/PAI-Memory) | 🧠 7-layer memory architecture (mem7 + ghost.build) | 🟡 Active |
-| [pai-mcp](https://github.com/pai-list/pai-mcp) | 🔌 Unified MCP gateway — memory/identity/verify tools | 🟡 Active |
-| [pai-website](https://github.com/pai-list/pai-website) | 🌍 Marketing hub — i18n EN/AR/ZH, .PAI showcase | 🟡 Active |
-| [pai-docs](https://github.com/pai-list/pai-docs) | 📖 Documentation portal | 🟡 Active |
-| [ADP](https://github.com/pai-list/ADP) | 🔍 Agent Discovery Protocol | 🟡 Alpha |
-| [pai-cli](https://github.com/pai-list/pai-cli) | ⚙️ Developer CLI | 🟡 Alpha |
-| [pai-skills](https://github.com/pai-list/pai-skills) | 📦 Skill registry & marketplace | 🟡 Alpha |
-| [pai-atom](https://github.com/pai-list/pai-atom) | 🎨 Design primitives & components | 🟡 Alpha |
-| [PiWorker](https://github.com/pai-list/PiWorker) | ⚡ Pi Network edge workers | 🟡 Alpha |
-| [axiomid-piverify](https://github.com/pai-list/axiomid-piverify) | 🛡️ Pi KYC + agent verification | 🟡 Alpha |
-| [openidentity.md](https://github.com/pai-list/openidentity.md) | 📜 OpenIdentity Protocol spec | 🟡 Active |
-| [AlphaAxiom](https://github.com/pai-list/AlphaAxiom) | 🔬 Research sandbox | 🔬 Lab |
-
-## 🧱 The Stack
-
-```
-Layer 7: Gspace      — Global Workspace (collab, monitor, teams)
-Layer 6: ADP         — Agent Discovery Protocol
-Layer 5: PAI-Memory  — 7-layer memory (mem7 + ghost.build + Upstash)
-Layer 4: pai-mcp     — Unified MCP gateway (6 tools)
-Layer 3: pai-agent-kit — Agent SDK + @pai/crypto + @pai/sdk
-Layer 2: AxiomID     — Identity, TrustChain, Passport, /api/memory, /verify
-Layer 1: Pi Network  — Human verification, KYC, base layer
-```
-
-## 🔗 Integrations
-
-| Platform | Role | Status |
-|----------|------|--------|
-| **Pi Network** | Human verification, KYC, base identity | ✅ Live (18M+ humans) |
-| **mem7** | Rust-powered memory engine (Ebbinghaus decay, graph recall, context scoring) | ✅ Integrated |
-| **Virtuals ACP** | Agent commerce, marketplace | ✅ Live (22 services) |
-| **Cloudflare** | Infrastructure, Workers, R2 | 🟡 Active |
-| **Ghost** | pgvector database layer | 🟡 Active |
-| **Vercel** | Web deployment | 🟡 Active |
-
-## 🚀 Quick Start
-
-```bash
-# Enter through AxiomID
-→ axiomid.app
-
-# Then explore:
-→ gspace.axiomid.app   # global workspace
-→ discover.axiomid.app # find agents
-→ agent.axiomid.app    # run your agent
-```
-
-## 🤝 Contributing
-
-All repos follow the **SOUL Protocol**:
-- **Muraqabah** — Divine awareness in every commit
-- **Tawbah** — Mistakes are beginnings, not ends
-- **TrustChain** — Every action append-only, never deleted
-
-## 🎁 Refer & Earn
-
-| Program | Link | Reward |
-|---------|------|--------|
-| **Pi Network** | [minepi.com/amrikyy](https://minepi.com/amrikyy) · code: **amrikyy** | Boosted mining rate + ecosystem access |
-| **Virtuals ACP** | [app.virtuals.io](https://app.virtuals.io) · refer friends | Up to 20% of trading fees |
-| **AxiomID** | [axiomid.app](https://axiomid.app) — share with devs | Early adopter access |
-
-> AI agents auto-join Pi Network via code `amrikyy`. Every join funds PAI infrastructure.
+> **Org:** [pai-list](https://github.com/pai-list) · 30 public repos · Created 2026-07-18
+> **Dashboard generated:** 2026-08-04 · **Verified:** live GitHub API + live HTTP checks · **Source:** `pai-universe-audit/DEPLOYMENT_STATUS.*` · `STRATEGIC_SCORES.*`
+> **Honesty:** every status below was checked live; DOWN means NXDOMAIN/404, not intent.
 
 ---
 
-<div align="center">
-  <sub>Built for All. For None. To Prove to All.</sub>
-</div>
+## 📡 Live Status Check (2026-08-04)
+
+| Service | Repo | URL | HTTP | Status |
+|---------|------|-----|------|--------|
+| AxiomID | AxiomID | https://axiomid.app | 200 | 🟢 LIVE |
+| API Gateway | pai-api-gateway | https://api.axiomid.app/health | 200 | 🟢 LIVE |
+| PiVerify | axiomid-piverify | https://piverify.axiomid.app | 200 | 🟢 LIVE |
+| Gspace | PAI-Gspace | https://gspace.axiomid.app | 200 | 🟢 LIVE |
+| Memory (L2/L3) | PAI-Memory | https://memory.axiomid.app | 404 | 🔴 DOWN |
+| Website | pai-website | https://pai.build | NXDOMAIN | 🔴 DOWN |
+| Docs | pai-docs | https://docs.pai.build | NXDOMAIN | 🔴 DOWN |
+| clawhub | clawhub | https://clawhub.pai-list.org | NXDOMAIN | 🔴 DOWN |
+| skills | pai-skills | https://skills.pai-list.org | NXDOMAIN | 🔴 DOWN |
+| Protocol specs | PAI-Protocol | https://pai-protocol.pai-list.github.io | cert | 🔴 DOWN |
+
+> **Watch out:** `api.axiomid.app/` (root) returns Express `Cannot GET /` — worker is live but root path is unhandled; use `/health`.
+
+---
+
+## 🧭 Repository Map (Live status from GitHub API)
+
+| Repo | Stars | Archived | Last push | Strategic tier |
+|------|-------|----------|-----------|----------------|
+| AxiomID | 2 | no | 2026-08-03 | 🟢 TIER 1 |
+| PAI-Memory | 0 | no | 2026-08-03 | 🟡 TIER 2 |
+| pai-api-gateway | 0 | no | 2026-08-03 | 🟡 TIER 2 |
+| PAI-Email-Agent | 0 | no | 2026-08-01 | 🟡 TIER 2 |
+| PiWorker | 0 | no | 2026-08-03 | 🟡 TIER 2 |
+| pai-mcp | 0 | no | 2026-08-03 | 🟡 TIER 2 |
+| pai-agent-kit | 0 | no | 2026-08-03 | 🟡 TIER 2 |
+| pai-docs | 0 | no | 2026-08-03 | 🟡 TIER 2 |
+| PAI-Gspace | 0 | no | 2026-08-02 | 🟡 TIER 2 |
+| pai-skills | 0 | no | 2026-08-03 | 🟡 TIER 2 |
+| pai-core | 0 | no | 2026-08-03 | 🟠 TIER 3 |
+| PAI-Protocol | 0 | no | 2026-08-03 | 🟠 TIER 3 |
+| ADP | 0 | no | 2026-08-02 | 🟠 TIER 3 |
+| clawhub | 0 | no | 2026-08-03 | 🟠 TIER 3 |
+| pai-website | 0 | no | 2026-08-02 | 🟠 TIER 3 |
+| .github | 0 | no | 2026-08-03 | 🟠 TIER 3 |
+| pai-atom | 0 | no | 2026-08-01 | 🔴 TIER 4 |
+| pai-cli | 0 | no | 2026-08-02 | 🔴 TIER 4 |
+| pai-atom | 0 | no | 2026-08-01 | 🔴 TIER 4 |
+| Pai-Agent-App-Models | — | — | — | 🔴 TIER 4 |
+| clawhub-ar | 0 | no | 2026-08-03 | 🔴 TIER 4 |
+| AlphaAxiom | 0 | no | — | 🔴 TIER 4 |
+| hermes-* (9 archived) | 0 | yes | 2026-07-31 | ⚫ ARCHIVED |
+
+> Full authoritative repo list → `ORG_INDEX.json`.
+
+---
+
+## 🏛️ Architecture (verified layer map)
+
+```
+axon id / api / memory / verify SEVING live
+Layer 1  Pi Network     human KYC verification (external)
+Layer 2  AxiomID        identity · TrustChain · Passport
+Layer 3  pai-agent-kit  agent runtime + SDK
+Layer 4  pai-mcp        MCP gateway (13.5k-line single file)
+Layer 5  PAI-Memory     L2 episodic (DO+SQLite) / L3 semantic (Vectorize+D1)
+Layer 6  ADP            agent discovery (signaling worker)
+Layer 7  PAI-Gspace     global workspace / pai-cli / pai-docs / pai-website
+Layer 8  skills         skill registry + learner
+```
+
+---
+
+## ✅ CI/CD & Security Snapshot (from Phase 5 — verified)
+
+- **No CI at all:** `pai-api-gateway` (LIVE worker!), `PAI-Protocol`
+- **Partial CI:** `pai-website` (Vercel deploy, no CI gate), `pai-core` (release-publish only)
+- **Solid:** AxiomID (18 workflows), PAI-Email-Agent (5, staging+prod), PiWorker (5), pai-docs (2 + Pages)
+- **Security gaps (Phase 1 findings):**
+  - Pi payments are **client-only, no server verification** in AxiomID → CRITICAL
+  - No Pi UID→DID mapping
+  - `pai-core` security-critical packages (crypto/verify/wallet) have **0 tests**
+  - `pai-mcp` is a **12.5k-line single file, 0 tests**
+
+---
+
+## 💰 Cloudflare cost fingerprint (estimate, free-tier based)
+
+| Tier | Monthly est. |
+|------|--------------|
+| Current footprint | $5–15/mo |
+| Small prod (<100 DAU) | $15–60/mo |
+| Scale (>1k DAU) | $60–250/mo |
+
+> All audited CF repos classify `FREE_TIER_FRIENDLY` (KV batching, D1 prepared stmts, topK caps).
+
+---
+
+## 🔮 Where the org invests next (score-driven)
+
+1. **AxiomID Pi verification** — score 3/10 (UNVERIFIED) → highest-leverage fix
+2. **Add CI to pai-api-gateway** — LIVE worker with zero CI
+3. **Re-deploy PAI-Memory** — best architecture (innov 9/10), not deployed
+4. **Test pai-core** crypto/verify/wallet — security-critical
+5. **Fix DNS** for pai.build/docs.pai.build/clawhub/skills domains
+
+---
+
+> Built for All. For None. To Prove to All.<br/>
+> Generated by PAI Universe forensic audit · Muraqabah · no fabricated numbers.
