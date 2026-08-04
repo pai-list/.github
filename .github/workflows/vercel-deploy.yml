@@ -84,9 +84,10 @@ jobs:
           VERCEL_PROJECT_ID: ${{ steps.project.outputs.pid }}
         run: |
           set -e
+          mkdir -p .vercel
           npm i -g vercel@latest >/dev/null 2>&1
           vercel link --yes --project "${{ inputs.project-name }}" --scope "$VERCEL_ORG_ID" --token "$VERCEL_TOKEN" >/dev/null 2>&1 || true
-          vercel deploy --prod --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" > .vercel/deploy-url.txt 2>&1
+          vercel deploy --prod --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" 2>&1 | tee .vercel/deploy-url.txt
           URL=$(tail -1 .vercel/deploy-url.txt)
           echo "deployment-url=$URL" >> "$GITHUB_OUTPUT"
           echo "Deployed: $URL"
