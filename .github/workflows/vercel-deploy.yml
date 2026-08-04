@@ -86,9 +86,7 @@ jobs:
           set -e
           npm i -g vercel@latest >/dev/null 2>&1
           vercel link --yes --project "${{ inputs.project-name }}" --scope "$VERCEL_ORG_ID" --token "$VERCEL_TOKEN" >/dev/null 2>&1 || true
-          vercel pull --yes --environment=production --scope "$VERCEL_ORG_ID" --token "$VERCEL_TOKEN" 2>&1 | tail -2
-          vercel build --prod --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" 2>&1 | tail -6
-          vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" --yes > .vercel/deploy-url.txt 2>&1
+          vercel deploy --prod --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" > .vercel/deploy-url.txt 2>&1
           URL=$(tail -1 .vercel/deploy-url.txt)
           echo "deployment-url=$URL" >> "$GITHUB_OUTPUT"
           echo "Deployed: $URL"
