@@ -1,6 +1,6 @@
 # 🌌 PAI Universe — Live Evidence Dashboard
 
-> **Org:** [pai-list](https://github.com/pai-list) · 30 public repos · Created 2026-07-18
+> **Org:** [pai-list](https://github.com/pai-list) · 27 public repos · Created 2026-07-18
 > **Dashboard generated:** 2026-08-04 · **Verified:** live GitHub API + live HTTP checks · **Source:** `pai-universe-audit/DEPLOYMENT_STATUS.*` · `STRATEGIC_SCORES.*`
 > **Honesty:** every status below was checked live; DOWN means NXDOMAIN/404, not intent.
 
