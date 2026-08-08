@@ -1,112 +1,64 @@
-# 🌌 PAI Universe — Live Evidence Dashboard
+# 🌌 PAI Universe — Live Status & Evidence
 
-> **Org:** [pai-list](https://github.com/pai-list) · 27 public repos · Created 2026-07-18
-> **Dashboard generated:** 2026-08-04 · **Verified:** live GitHub API + live HTTP checks · **Source:** `pai-universe-audit/DEPLOYMENT_STATUS.*` · `STRATEGIC_SCORES.*`
-> **Honesty:** every status below was checked live; DOWN means NXDOMAIN/404, not intent.
+> **Org:** [pai-list](https://github.com/pai-list) · **23 active** + 4 archived public repos (GitHub API, 2026-08-08)
+> **Last verified:** 2026-08-08 — every row below re-checked live with the command shown; DOWN = NXDOMAIN/404, not intent.
 
----
+## 🟢 Live Services (HTTP-verified 2026-08-08)
 
-## 📡 Live Status Check (2026-08-04)
+All subdomains resolve and serve 200 through the Cloudflare edge worker (`infrastructure/protocol-stubs`), except where noted.
 
-| Service | Repo | URL | HTTP | Status |
-|---------|------|-----|------|--------|
-| AxiomID | AxiomID | https://axiomid.app | 200 | 🟢 LIVE |
-| API Gateway | pai-api-gateway | https://api.axiomid.app/health | 200 | 🟢 LIVE |
-| PiVerify | axiomid-piverify | https://piverify.axiomid.app | 200 | 🟢 LIVE |
-| Gspace | PAI-Gspace | https://gspace.axiomid.app | 200 | 🟢 LIVE |
-| Memory (L2/L3) | PAI-Memory | https://memory.axiomid.app | 404 | 🔴 DOWN |
-| Website | pai-website | https://pai.build | NXDOMAIN | 🔴 DOWN |
-| Docs | pai-docs | https://docs.pai.build | NXDOMAIN | 🔴 DOWN |
-| clawhub | clawhub | https://clawhub.pai-list.org | NXDOMAIN | 🔴 DOWN |
-| skills | pai-skills | https://skills.pai-list.org | NXDOMAIN | 🔴 DOWN |
-| Protocol specs | PAI-Protocol | https://pai-protocol.pai-list.github.io | cert | 🔴 DOWN |
+| Service | URL | Verify | Status |
+|---------|-----|--------|--------|
+| Hub — Universal Entry Point | `https://axiomid.app/` | `curl -s -o /dev/null -w"%{http_code}" https://axiomid.app/` → **200** | 🟢 LIVE |
+| Hub health | `https://axiomid.app/health` | → **200** `{"status":"healthy","protocol":"axiomid"}` | 🟢 LIVE |
+| CaaS / MCP discovery | `https://axiomid.app/.well-known/mcp.json` | → **200** (JSON, protocol `publicmcp`) | 🟢 LIVE |
+| Agent discoverability | `/agent.json` · `/llms.txt` · `/agentic.txt` · `/sitemap.xml` | all → **200** | 🟢 LIVE |
+| Skills registry (4-lang) | `https://skills.axiomid.app/` | → **200** (`pai-skills` worker) | 🟢 LIVE |
+| Gspace | `https://gspace.axiomid.app` | → **200** (Vercel prod, `PAI-Gspace`) | 🟢 LIVE |
+| Learn academy | `https://learn.axiomid.app/` | → **200** (tracks + Earn⇄Learn loop) | 🟢 LIVE |
+| Earn exchange | `https://earn.axiomid.app/` | → **200** (portal; escrow not yet wired) | 🟢 LIVE |
+| Node port | `https://node.axiomid.app/` | → **200** | 🟢 LIVE |
+| Auth portal | `https://auth.axiomid.app/` | → **200** (Pi SDK auth pending) | 🟢 LIVE |
+| Memory | `https://memory.axiomid.app/` | → **200** (portal; L2/L3 engines Phase-2) | 🟢 LIVE |
+| PiVerify (KYA) | `https://piverify.axiomid.app` | → **200** `{"service":"axiomid-piverify"}` | 🟢 LIVE |
+| — aip · ppp · mail · harness · index · jobs · rewards · ads | `*.axiomid.app` | each → **200** (route-mapped portals) | 🟢 LIVE |
+| OG image API | `https://axiomid.app/api/og` | worker→Vercel proxy (see note \*) | 🟡 PARTIAL |
 
-> **Watch out:** `api.axiomid.app/` (root) returns Express `Cannot GET /` — worker is live but root path is unhandled; use `/health`.
+\* **OG note:** the apex is a worker, so `/api/og` proxies to the AxiomID Next.js app on Vercel; that Vercel deployment currently returns `403 Invalid host` on its preview host — Vercel deployment-protection/alias fix is the open item.
 
----
+## 🔴 Not live (explicitly)
 
-## 🧭 Repository Map (Live status from GitHub API)
+| Service | State | Proof |
+|---------|-------|-------|
+| `api.axiomid.app` | **NXDOMAIN** — not deployed | `curl -s --max-time 8 https://api.axiomid.app/health` → `000` |
+| `pai.build` / `docs.pai.build` | NXDOMAIN (marketing/docs not published yet) | — |
+| Identity Next.js app | Vercel build green, **no public domain** (403 on direct alias) | not user-facing yet |
 
-| Repo | Stars | Archived | Last push | Strategic tier |
-|------|-------|----------|-----------|----------------|
-| AxiomID | 2 | no | 2026-08-03 | 🟢 TIER 1 |
-| PAI-Memory | 0 | no | 2026-08-03 | 🟡 TIER 2 |
-| pai-api-gateway | 0 | no | 2026-08-03 | 🟡 TIER 2 |
-| PAI-Email-Agent | 0 | no | 2026-08-01 | 🟡 TIER 2 |
-| PiWorker | 0 | no | 2026-08-03 | 🟡 TIER 2 |
-| pai-mcp | 0 | no | 2026-08-03 | 🟡 TIER 2 |
-| pai-agent-kit | 0 | no | 2026-08-03 | 🟡 TIER 2 |
-| pai-docs | 0 | no | 2026-08-03 | 🟡 TIER 2 |
-| PAI-Gspace | 0 | no | 2026-08-02 | 🟡 TIER 2 |
-| pai-skills | 0 | no | 2026-08-03 | 🟡 TIER 2 |
-| pai-core | 0 | no | 2026-08-03 | 🟠 TIER 3 |
-| PAI-Protocol | 0 | no | 2026-08-03 | 🟠 TIER 3 |
-| ADP | 0 | no | 2026-08-02 | 🟠 TIER 3 |
-| clawhub | 0 | no | 2026-08-03 | 🟠 TIER 3 |
-| pai-website | 0 | no | 2026-08-02 | 🟠 TIER 3 |
-| .github | 0 | no | 2026-08-03 | 🟠 TIER 3 |
-| pai-atom | 0 | no | 2026-08-01 | 🔴 TIER 4 |
-| pai-cli | 0 | no | 2026-08-02 | 🔴 TIER 4 |
-| pai-atom | 0 | no | 2026-08-01 | 🔴 TIER 4 |
-| Pai-Agent-App-Models | — | — | — | 🔴 TIER 4 |
-| clawhub-ar | 0 | no | 2026-08-03 | 🔴 TIER 4 |
-| AlphaAxiom | 0 | no | — | 🔴 TIER 4 |
-| hermes-* (9 archived) | 0 | yes | 2026-07-31 | ⚫ ARCHIVED |
+> History: `clawhub.*`/`clawhub`/`clawhub-ar` repos were **deleted** 2026-08-07 (cleanup documented in vault `05-Layers/L7-Skills.md`); `hermes-*` and 4 repos are archived. Nothing that was deleted is listed as live.
 
-> Full authoritative repo list → `ORG_INDEX.json`.
+## 🧭 Repository Map (GitHub API 2026-08-08)
 
----
+**Active (23):** `.github` · AxiomID · protocol-stubs · pai-skills · PAI-Gspace · pai-website · pai-docs · pai-mcp · pai-gateways · pai-api-gateway · pai-agent-kit · PAI-Memory · PAI-Protocol · ADP · openidentity · openidentity.md · axiomid-piverify · pai-atom · pai-cli · pai-core · pai-tools · PAI-Email-Agent · PiWorker
 
-## 🏛️ Architecture (verified layer map)
+**Archived (4):** `pai-port` · `pai-sam` · `ppm` · `skillbuilder` (functionality merged into `pai-tools`)
+
+## 🏛️ Architecture (as actually running)
 
 ```
-axon id / api / memory / verify SEVING live
-Layer 1  Pi Network     human KYC verification (external)
-Layer 2  AxiomID        identity · TrustChain · Passport
-Layer 3  pai-agent-kit  agent runtime + SDK
-Layer 4  pai-mcp        MCP gateway (13.5k-line single file)
-Layer 5  PAI-Memory     L2 episodic (DO+SQLite) / L3 semantic (Vectorize+D1)
-Layer 6  ADP            agent discovery (signaling worker)
-Layer 7  PAI-Gspace     global workspace / pai-cli / pai-docs / pai-website
-Layer 8  skills         skill registry + learner
+Edge (Cloudflare Workers)   hub + 15 portal subdomains + CaaS + SEO/OG + sitemap   → LIVE
+L1 Identity                  AxiomID (Next.js 15, Vercel) — i18n EN/AR/ZH/HI + PostHog wired; public domain pending
+L2 Runtime / L3 memory       pai-agent-kit · PAI-Memory      → portals live, engines Phase-2
+L4 Protocol                  PAI-Protocol · ADP · pai-mcp   → spec repos; live stubs on edge
+L7 Market                    pai-skills (live 4-lang registry — 4GET) · earn portal
 ```
 
----
+Honesty label: **portal live = page served edge-first; token/escrow/agent execution is NOT claimed live anywhere.**
 
-## ✅ CI/CD & Security Snapshot (from Phase 5 — verified)
+## 🔍 Re-verify in one command
 
-- **No CI at all:** `pai-api-gateway` (LIVE worker!), `PAI-Protocol`
-- **Partial CI:** `pai-website` (Vercel deploy, no CI gate), `pai-core` (release-publish only)
-- **Solid:** AxiomID (18 workflows), PAI-Email-Agent (5, staging+prod), PiWorker (5), pai-docs (2 + Pages)
-- **Security gaps (Phase 1 findings):**
-  - Pi payments are **client-only, no server verification** in AxiomID → CRITICAL
-  - No Pi UID→DID mapping
-  - `pai-core` security-critical packages (crypto/verify/wallet) have **0 tests**
-  - `pai-mcp` is a **12.5k-line single file, 0 tests**
-
----
-
-## 💰 Cloudflare cost fingerprint (estimate, free-tier based)
-
-| Tier | Monthly est. |
-|------|--------------|
-| Current footprint | $5–15/mo |
-| Small prod (<100 DAU) | $15–60/mo |
-| Scale (>1k DAU) | $60–250/mo |
-
-> All audited CF repos classify `FREE_TIER_FRIENDLY` (KV batching, D1 prepared stmts, topK caps).
-
----
-
-## 🔮 Where the org invests next (score-driven)
-
-1. **AxiomID Pi verification** — score 3/10 (UNVERIFIED) → highest-leverage fix
-2. **Add CI to pai-api-gateway** — LIVE worker with zero CI
-3. **Re-deploy PAI-Memory** — best architecture (innov 9/10), not deployed
-4. **Test pai-core** crypto/verify/wallet — security-critical
-5. **Fix DNS** for pai.build/docs.pai.build/clawhub/skills domains
-
----
-
-> Built for All. For None. To Prove to All.<br/>
-> Generated by PAI Universe forensic audit · Muraqabah · no fabricated numbers.
+```bash
+for u in axiomid.app skills.axiomid.app gspace.axiomid.app learn.axiomid.app earn.axiomid.app node.axiomid.app memory.axiomid.app auth.axiomid.app piverify.axiomid.app; do
+  printf "%-26s %s\n" "$u" "$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 https://$u)"
+done
+curl -s https://axiomid.app/.well-known/mcp.json -H "Accept: application/mcp+json"
+```
