@@ -12,7 +12,7 @@ Build a unified, simple, secure, and monitored PAI Agentic OS: a distributed sys
 6. Modularity — protocols (ADP, PAI-Protocol, AIP) and skills (pai-skills, pai-atom) are decoupled, versioned, and independently deployable.
 
 ## Repository Topology
-The organization has been consolidated from 33 to 27 repositories. Twelve subagents live as folders under `infrastructure/pai-agent/` rather than as separate repositories, preserving git history and reducing operational overhead of cross-repo coordination.
+The organization has been consolidated from 33 to 27 repositories. Twelve subagents live as folders under `infrastructure/pai-agent/agent/subagents/` (memory, email, ppp, earn, skills, auth, aip, node, harness, index, openid, gspace) rather than as separate repositories, preserving git history and reducing operational overhead of cross-repo coordination.
 
 ## Architecture Layers
 - Identity Layer: AxiomID, OpenIdentity — DID, TrustChain, verifiable credentials.
@@ -26,14 +26,16 @@ The organization has been consolidated from 33 to 27 repositories. Twelve subage
 - Public Surface: pai-website, pai-docs, openidentity.md.
 
 ## Phase Plan
-- Phase 0 (execution: CI wiring, API keys, deployments) remains BLOCKED until explicit greenlight from the founder.
-- Documentation (this VISION.md and CREDITS.md) is produced first so all collaborators and agents share the same source of truth.
+- Phase 0 (execution: CI wiring, API keys, deployments): **PARTIAL.** Scaffold done — EVE workspace, 12 subagent folders, wrangler.jsonc, Node 24 CI. Deploy stays gated until CI secrets (Gemini Flash, NVIDIA NIM) are set from founder and deploy approved.
+- Phase 0 items A (EVE scaffold) and B (12 subagents + wrangler) complete. C (secrets) wired, values pending. D (doc-intel gate) live in `infrastructure/pai-agent/`.
+- Documentation (this VISION.md and CREDITS.md) is the source of truth for all collaborators and agents.
 
 ## Status
 - Organization cleanup: complete.
 - Architectural planning: complete.
+- EVE workspace scaffold: complete (12 subagents, wrangler, CI, doc-intel gate).
 - Documentation: in progress.
-- Phase 0 execution: pending approval.
+- Phase 0 deploy: pending secrets + approval.
 
 ## External Standards Adopted (No Governance Join)
 We do not join CNCF or transfer trademark/governance of PPP, OpenIdentity, or the agent kit to any foundation. Instead we adopt select open, zero-cost standards as dependencies to strengthen our honest, no-false-claims positioning:
@@ -42,5 +44,8 @@ We do not join CNCF or transfer trademark/governance of PPP, OpenIdentity, or th
 2. in-toto / Sigstore — attach provenance (claim : commit hash : signer) to agent publishes, formalizing our git-hash + doc-check gate as a named, checkable standard referenced in README/doc-intelligence sections.
 3. OpenTelemetry — unified trace/heartbeat format for the 12 subagents' sessions, giving us baseline observability without building custom tooling.
 4. OpenFeature / OpenCost — deferred; adopt later only if/when feature flags or cost telemetry become necessary.
+
+## Evaluated / Deferred
+- **Zerolang (zerolang.ai, Vercel Labs)** — experimental graph-native language for agents (Apache-2.0). **Deferred**: excluded from Phase 0/1 under the same rule as HarnessAgent/Vercel Sandbox (experimental until independently verified). It is a tool, not a collaborator. Revisit only once stable.
 
 Rationale: these are consumed as libraries/specs, not memberships. Zero governance surface, zero IP risk, zero cost — while giving the TrustChain/doc-intelligence gate industry-recognized backing six months earlier than building bespoke equivalents.

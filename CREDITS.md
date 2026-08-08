@@ -18,7 +18,17 @@ The PAI Universe does not join or transfer governance to any foundation (e.g. CN
 - Pi Network — trust and payment layer for agent-to-agent and agent-to-human transactions.
 
 ## AI Collaborators
-This project has been built in collaboration with multiple AI coding and research agents, including Claude, Gemini, Grok, and GitHub Copilot, used for code generation, architectural review, and documentation drafting under the founder's direction.
+This project is built in collaboration with multiple AI coding and research agents, working under the founder's direction for code generation, architectural review, and documentation drafting:
+
+- **opencode** — primary interactive coding agent.
+- **Hermes** — local research & coding agent pipeline.
+- **Jules AI** — cloud agentic coding assistant.
+- **CodeRabbit AI** — automated code review.
+- **Antigravity** — development environment / IDE.
+- **Claude, Gemini, Grok, GitHub Copilot** — code generation, architectural review, and documentation drafting.
+
+## Evaluated / Deferred Tools
+- **Zerolang (zerolang.ai, Vercel Labs)** — experimental graph-native language for agents (Apache-2.0). Evaluated and explicitly **deferred**: not used in Phase 0/1, and it is **not** an AI collaborator. Revisit only after it leaves experimental status, per the same exclusion rule as HarnessAgent and Vercel Sandbox.
 
 ## License Note
 Individual repositories retain their own licenses (see each repo's LICENSE file, typically MIT). This CREDITS.md documents external standards and infrastructure dependencies, not a transfer of ownership or governance.
